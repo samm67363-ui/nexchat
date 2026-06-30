@@ -1,16 +1,20 @@
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 
-let serviceAccount;
+let credentials;
 
-if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+if (process.env.FIREBASE_PRIVATE_KEY) {
+  credentials = {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  };
 } else {
-  serviceAccount = require("./serviceAccountKey.json");
+  credentials = require("./serviceAccountKey.json");
 }
 
 initializeApp({
-  credential: cert(serviceAccount),
+  credential: cert(credentials),
 });
 
 module.exports = { getAuth };
