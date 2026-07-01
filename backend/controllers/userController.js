@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const admin = require("../config/firebase");
 
 // POST /api/users/register — called after Firebase signup
 const registerUser = async (req, res) => {
