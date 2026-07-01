@@ -3,13 +3,18 @@ const User = require("../models/User");
 // POST /api/users/register — called after Firebase signup
 const registerUser = async (req, res) => {
   const { firebaseUid, username, email, avatar } = req.body;
+  console.log("📝 Register called with:", { firebaseUid, username, email });
   try {
     let user = await User.findOne({ firebaseUid });
-    if (user) return res.status(200).json(user);
-
+    if (user) {
+      console.log("✅ User already exists:", user._id);
+      return res.status(200).json(user);
+    }
     user = await User.create({ firebaseUid, username, email, avatar });
+    console.log("✅ User created:", user._id);
     res.status(201).json(user);
   } catch (err) {
+    console.error("❌ Register error:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
