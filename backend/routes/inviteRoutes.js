@@ -11,7 +11,7 @@ const {
 router.post("/generate", protect, generateInvite);
 
 // Validate an invite link (check if valid before joining)
-router.get("/:code", protect, validateInvite);
+router.get("/:code", validateInvite);
 
 // Join using an invite link
 router.post("/:code/join", protect, joinInvite);

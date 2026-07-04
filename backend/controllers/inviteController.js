@@ -93,9 +93,14 @@ const joinInvite = async (req, res) => {
       return res.status(400).json({ message: "This invite link has expired" });
     }
 
-    if (invite.createdBy.toString() === req.user._id.toString()) {
-      return res.status(400).json({ message: "You cannot join your own invite link" });
-    }
+    if (
+  req.user &&
+  invite.createdBy._id.toString() === req.user._id.toString()
+) {
+  return res.status(400).json({
+    message: "You cannot join your own invite link",
+  });
+}
 
     // Mark invite as used
     invite.used = true;

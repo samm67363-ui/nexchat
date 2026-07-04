@@ -18,19 +18,19 @@ export default function InvitePage() {
   const [joining, setJoining] = useState(false);
 
   useEffect(() => {
-    if (!currentUser) { setLoading(false); return; }
-    const validate = async () => {
-      try {
-        const res = await api.get(`/invites/${code}`);
-        setInvite(res.data);
-      } catch (err) {
-        setError(err.response?.data?.message || "Invalid invite link");
-      } finally {
-        setLoading(false);
-      }
-    };
-    validate();
-  }, [code, currentUser]);
+  const validate = async () => {
+    try {
+      const res = await api.get(`/invites/${code}`);
+      setInvite(res.data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid invite link");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  validate();
+}, [code]);
 
   const handleJoin = async () => {
     setJoining(true);
