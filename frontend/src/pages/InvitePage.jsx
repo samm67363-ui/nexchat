@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 import { useChat } from "../context/ChatContext";
 import Avatar from "../components/ui/Avatar";
 import "../styles/invite.css";
@@ -8,6 +9,7 @@ import "../styles/invite.css";
 export default function InvitePage() {
   const { code } = useParams();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const { setActiveConversation, fetchMessages, fetchConversations } = useChat();
 
   const [invite, setInvite] = useState(null);
@@ -15,8 +17,8 @@ export default function InvitePage() {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
 
-  // Validate invite on load
   useEffect(() => {
+    if (!currentUser) { setLoading(false); return; }
     const validate = async () => {
       try {
         const res = await api.get(`/invites/${code}`);
@@ -28,19 +30,16 @@ export default function InvitePage() {
       }
     };
     validate();
-  }, [code]);
+  }, [code, currentUser]);
 
   const handleJoin = async () => {
     setJoining(true);
     try {
       const res = await api.post(`/invites/${code}/join`);
       const { conversation } = res.data;
-
-      // Refresh conversations list and open the chat
       await fetchConversations();
       setActiveConversation(conversation);
       fetchMessages(conversation._id);
-
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to join");
@@ -48,7 +47,38 @@ export default function InvitePage() {
     }
   };
 
-  // Loading state
+  // Not logged in — show login prompt
+  if (!currentUser) {
+    return (
+      <div className="invite-page">
+        <div className="invite-card animate-slide-up">
+          <div className="invite-logo">
+            <div className="invite-logo-icon">⚡</div>
+            <h1>NexChat</h1>
+          </div>
+          <div className="invite-divider" />
+          <div className="invite-info">
+            <p>You need to be logged in to accept this invite.</p>
+          </div>
+          <Link
+            to={`/login?redirect=/invite/${code}`}
+            className="invite-btn primary"
+            style={{ textDecoration: "none", marginBottom: "10px" }}
+          >
+            Sign In to Accept
+          </Link>
+          <Link
+            to={`/register?redirect=/invite/${code}`}
+            className="invite-btn secondary"
+            style={{ textDecoration: "none" }}
+          >
+            Create Account
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="invite-page">
@@ -62,7 +92,6 @@ export default function InvitePage() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="invite-page">
@@ -78,69 +107,34 @@ export default function InvitePage() {
     );
   }
 
-  // Valid invite
   return (
     <div className="invite-page">
       <div className="invite-card animate-slide-up">
-        {/* Header */}
         <div className="invite-logo">
           <div className="invite-logo-icon">⚡</div>
           <h1>NexChat</h1>
         </div>
-
         <div className="invite-divider" />
-
-        {/* Invite info */}
         <div className="invite-info">
           <Avatar user={invite.createdBy} size={64} />
           <h2>{invite.createdBy.username}</h2>
           <p>invited you to a private anonymous chat</p>
         </div>
-
-        {/* Expiry timer */}
         <div className="invite-expiry">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 6v6l4 2"/>
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
           </svg>
-          <span>
-            Expires at {new Date(invite.expiresAt).toLocaleTimeString()}
-          </span>
+          <span>Expires at {new Date(invite.expiresAt).toLocaleTimeString()}</span>
         </div>
-
-        {/* Features */}
         <div className="invite-features">
-          <div className="invite-feature">
-            <span>🔒</span>
-            <p>One-time use only</p>
-          </div>
-          <div className="invite-feature">
-            <span>⏱️</span>
-            <p>Expires in 10 minutes</p>
-          </div>
-          <div className="invite-feature">
-            <span>💬</span>
-            <p>Private conversation</p>
-          </div>
+          <div className="invite-feature"><span>🔒</span><p>One-time use only</p></div>
+          <div className="invite-feature"><span>⏱️</span><p>Expires in 10 min</p></div>
+          <div className="invite-feature"><span>💬</span><p>Private chat</p></div>
         </div>
-
-        {/* Actions */}
-        <button
-          className="invite-btn primary"
-          onClick={handleJoin}
-          disabled={joining}
-        >
-          {joining ? (
-            <><span className="invite-spinner small" /> Joining...</>
-          ) : (
-            "Accept & Start Chatting"
-          )}
+        <button className="invite-btn primary" onClick={handleJoin} disabled={joining}>
+          {joining ? <><span className="invite-spinner small" /> Joining...</> : "Accept & Start Chatting"}
         </button>
-
-        <button
-          className="invite-btn secondary"
-          onClick={() => navigate("/")}
-        >
+        <button className="invite-btn secondary" onClick={() => navigate("/")}>
           Decline
         </button>
       </div>
