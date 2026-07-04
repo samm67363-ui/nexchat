@@ -29,7 +29,10 @@ export default function App() {
         <Route path="/" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/privacy" element={<PrivateRoute><PrivacySettingsPage /></PrivateRoute>} />
-        <Route path="/invite/:code" element={<PrivateRoute><InvitePage /></PrivateRoute>} />
+        <Route
+  path="/invite/:code"
+  element={<h1>INVITE PAGE IS REACHED</h1>}
+/>
       </Routes>
       
     </BrowserRouter>
