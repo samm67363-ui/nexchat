@@ -46,4 +46,24 @@ export default function LoginPage() {
               required
             />
           </div>
-          <div
+          <div className="auth-field">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+            />
+          </div>
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? <span className="spinner" /> : "Sign In"}
+          </button>
+        </form>
+        <p className="auth-switch">
+          Don't have an account? <Link to="/register">Create one</Link>
+        </p>
+      </div>
+    </div>
+  );
+}
