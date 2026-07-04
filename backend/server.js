@@ -29,7 +29,11 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/conversations", require("./routes/conversationRoutes"));
 app.use("/api/messages", require("./routes/messageRoutes"));
+<<<<<<< HEAD
 app.use("/api/privacy", require("./routes/privacyRoutes"));
+=======
+app.use("/api/invites", require("./routes/inviteRoutes"));
+>>>>>>> feature/anonymous-chat-link
 
 app.get("/", (req, res) => res.send("ChatApp API running ✅"));
 

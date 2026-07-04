@@ -4,7 +4,11 @@ import { useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ChatPage from "./pages/ChatPage";
+<<<<<<< HEAD
 import PrivacySettingsPage from "./pages/PrivacySettingsPage";
+=======
+import InvitePage from "./pages/InvitePage";
+>>>>>>> feature/anonymous-chat-link
 
 const PrivateRoute = ({ children }) => {
   const { currentUser } = useAuth();
@@ -26,6 +30,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/privacy" element={<PrivateRoute><PrivacySettingsPage /></PrivateRoute>} />
       </Routes>
+      <Route path="/invite/:code" element={<PrivateRoute><InvitePage /></PrivateRoute>} />
     </BrowserRouter>
   );
 }
