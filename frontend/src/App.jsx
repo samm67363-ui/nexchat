@@ -4,6 +4,7 @@ import { useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ChatPage from "./pages/ChatPage";
+import PrivacySettingsPage from "./pages/PrivacySettingsPage";
 
 const PrivateRoute = ({ children }) => {
   const { currentUser } = useAuth();
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
         <Route path="/" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/privacy" element={<PrivateRoute><PrivacySettingsPage /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
   );

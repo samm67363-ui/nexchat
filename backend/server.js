@@ -29,6 +29,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/conversations", require("./routes/conversationRoutes"));
 app.use("/api/messages", require("./routes/messageRoutes"));
+app.use("/api/privacy", require("./routes/privacyRoutes"));
 
 app.get("/", (req, res) => res.send("ChatApp API running ✅"));
 
