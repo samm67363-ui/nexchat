@@ -30,6 +30,8 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/privacy" element={<PrivateRoute><PrivacySettingsPage /></PrivateRoute>} />
 <Route path="/invite/:code" element={<InvitePage />} />
+<Route path="/anonymous/:roomId" element={<AnonymousChatPage />} />
+<Route path="/anonymous/ended" element={<AnonymousEndedPage />} />
       </Routes>
       
     </BrowserRouter>
