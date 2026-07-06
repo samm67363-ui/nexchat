@@ -6,9 +6,8 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const socketHandler = require("./socket/socketHandler");
 const anonymousSocketHandler = require("./socket/anonymousSocketHandler");
-// ... existing: socketHandler(io);
-anonymousSocketHandler(io); // new — mounted on io.of("/anonymous"), fully isolated
 const anonymousRoutes = require("./routes/anonymousRoutes");
+const startAnonymousCleanupCron = require("./services/anonymousCleanupCron");
 
 const app = express();
 const server = http.createServer(app);
@@ -33,9 +32,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/conversations", require("./routes/conversationRoutes"));
 app.use("/api/messages", require("./routes/messageRoutes"));
-
 app.use("/api/privacy", require("./routes/privacyRoutes"));
-
 app.use("/api/invites", require("./routes/inviteRoutes"));
 app.use("/api/anonymous", anonymousRoutes);
 
@@ -43,9 +40,10 @@ app.get("/", (req, res) => res.send("ChatApp API running ✅"));
 
 // Socket.IO
 socketHandler(io);
+anonymousSocketHandler(io);
+
+// Cron jobs
+startAnonymousCleanupCron();
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-const startAnonymousCleanupCron = require("./services/anonymousCleanupCron");
-// ... after mongoose.connect(...) succeeds:
-startAnonymousCleanupCron();
