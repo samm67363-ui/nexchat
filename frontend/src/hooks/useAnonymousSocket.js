@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { io } from "socket.io-client";
 
-const SOCKET_URL = import.meta.env.VITE_API_URL; // same backend URL your other socket uses
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;// same backend URL your other socket uses
 
 export default function useAnonymousSocket({ roomId, identity }) {
   const socketRef = useRef(null);
