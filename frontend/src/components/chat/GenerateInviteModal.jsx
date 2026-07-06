@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
 export default function GenerateInviteModal({ onClose }) {
+  const navigate = useNavigate();
   const [inviteLink, setInviteLink] = useState("");
+  const [roomId, setRoomId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [expiresAt, setExpiresAt] = useState(null);
@@ -15,6 +18,7 @@ export default function GenerateInviteModal({ onClose }) {
       const res = await api.post("/anonymous/invite");
       setInviteLink(res.data.link);
       setExpiresAt(res.data.expiresAt);
+      setRoomId(res.data.roomId);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to generate link");
     } finally {
@@ -26,6 +30,11 @@ export default function GenerateInviteModal({ onClose }) {
     navigator.clipboard.writeText(inviteLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const openChat = () => {
+    onClose();
+    navigate(`/anonymous/${roomId}`);
   };
 
   return (
@@ -79,6 +88,15 @@ export default function GenerateInviteModal({ onClose }) {
               <button className="auth-btn" onClick={copyLink} style={{ width: "100%", marginBottom: "10px" }}>
                 {copied ? "✓ Copied!" : "Copy Link"}
               </button>
+
+              <button
+                className="auth-btn"
+                onClick={openChat}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                Open Anonymous Chat
+              </button>
+
               <button
                 onClick={generate}
                 disabled={loading}
