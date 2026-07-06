@@ -6,15 +6,17 @@ export default function GenerateInviteModal({ onClose }) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [expiresAt, setExpiresAt] = useState(null);
+  const [error, setError] = useState("");
 
   const generate = async () => {
     setLoading(true);
+    setError("");
     try {
-      const res = await api.post("/invites/generate");
-      setInviteLink(res.data.inviteLink);
+      const res = await api.post("/anonymous/invite");
+      setInviteLink(res.data.link);
       setExpiresAt(res.data.expiresAt);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to generate link");
+      setError(err.response?.data?.message || "Failed to generate link");
     } finally {
       setLoading(false);
     }
@@ -33,7 +35,7 @@ export default function GenerateInviteModal({ onClose }) {
           <h3>Anonymous Chat Link</h3>
           <button className="icon-btn" onClick={onClose}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6 6 18M6 6l12 12"/>
+              <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -43,6 +45,13 @@ export default function GenerateInviteModal({ onClose }) {
               <p style={{ fontSize: "14px", color: "var(--text-secondary)", marginBottom: "20px", lineHeight: "1.6" }}>
                 Generate a one-time anonymous chat link. Anyone with the link can start a private conversation with you. The link expires in <strong>10 minutes</strong> and can only be used <strong>once</strong>.
               </p>
+
+              {error && (
+                <p style={{ fontSize: "13px", color: "var(--danger, #e05252)", marginBottom: "12px" }}>
+                  {error}
+                </p>
+              )}
+
               <button className="auth-btn" onClick={generate} disabled={loading} style={{ width: "100%" }}>
                 {loading ? <span className="spinner" /> : "Generate Link"}
               </button>
@@ -52,17 +61,19 @@ export default function GenerateInviteModal({ onClose }) {
               <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "12px" }}>
                 Share this link — expires at {new Date(expiresAt).toLocaleTimeString()}, one-time use only.
               </p>
-              <div style={{
-                background: "var(--bg-secondary)",
-                border: "1.5px solid var(--border)",
-                borderRadius: "var(--radius-sm)",
-                padding: "12px",
-                wordBreak: "break-all",
-                fontSize: "13px",
-                color: "var(--accent)",
-                marginBottom: "12px",
-                lineHeight: "1.5",
-              }}>
+              <div
+                style={{
+                  background: "var(--bg-secondary)",
+                  border: "1.5px solid var(--border)",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "12px",
+                  wordBreak: "break-all",
+                  fontSize: "13px",
+                  color: "var(--accent)",
+                  marginBottom: "12px",
+                  lineHeight: "1.5",
+                }}
+              >
                 {inviteLink}
               </div>
               <button className="auth-btn" onClick={copyLink} style={{ width: "100%", marginBottom: "10px" }}>
@@ -72,15 +83,17 @@ export default function GenerateInviteModal({ onClose }) {
                 onClick={generate}
                 disabled={loading}
                 style={{
-                  width: "100%", padding: "10px",
+                  width: "100%",
+                  padding: "10px",
                   background: "none",
                   border: "1px solid var(--border)",
                   borderRadius: "var(--radius-sm)",
                   color: "var(--text-secondary)",
-                  fontSize: "14px", cursor: "pointer",
+                  fontSize: "14px",
+                  cursor: "pointer",
                 }}
               >
-                Generate New Link
+                {loading ? <span className="spinner" /> : "Generate New Link"}
               </button>
             </>
           )}
