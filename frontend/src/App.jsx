@@ -8,6 +8,8 @@ import ChatPage from "./pages/ChatPage";
 import PrivacySettingsPage from "./pages/PrivacySettingsPage";
 
 import InvitePage from "./pages/InvitePage";
+import AnonymousChatPage from "./pages/AnonymousChatPage";
+import AnonymousEndedPage from "./pages/AnonymousEndedPage";
 
 
 const PrivateRoute = ({ children }) => {
