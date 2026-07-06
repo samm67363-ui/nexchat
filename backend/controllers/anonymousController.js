@@ -6,8 +6,7 @@ const AnonymousRoom = require("../models/AnonymousRoom");
 // POST /api/anonymous/invite  (host only — requires auth middleware upstream)
 exports.createInvite = async (req, res) => {
   try {
-    const hostUid = req.user.uid; // set by your existing Firebase auth middleware
-
+  
     const code = uuidv4();
     const roomId = `anon-${uuidv4()}`;
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
