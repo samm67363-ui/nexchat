@@ -3,18 +3,32 @@ const GuestSession = require("../models/GuestSession");
 const AnonymousRoom = require("../models/AnonymousRoom");
 const AnonymousMessage = require("../models/AnonymousMessage");
 const User = require("../models/User");
+const { getOnlineSocketId } = require("./socketHandler"); // NEW
 
 module.exports = function anonymousSocketHandler(io) {
   // Separate namespace so this never touches your existing "/" socket auth flow
   const anonNsp = io.of("/anonymous");
+
+  // Helper: notify the host on their MAIN namespace socket (not /anonymous),
+  // since the host is usually browsing the regular NexChat UI, not this page.
+  const notifyHost = async (roomId, event, payload) => {
+    try {
+      const room = await AnonymousRoom.findOne({ roomId });
+      if (!room) return;
+      const hostSocketId = getOnlineSocketId(room.hostUser.toString());
+      if (hostSocketId) {
+        io.to(hostSocketId).emit(event, { roomId, ...payload });
+      }
+    } catch (err) {
+      console.error(`notifyHost (${event}) error:`, err.message);
+    }
+  };
 
   anonNsp.on("connection", (socket) => {
     let currentRoomId = null;
     let currentIdentity = null; // { type: 'host'|'guest', nickname, guestId? }
 
     // --- Join room ---
-    // Host joins with their Firebase-verified identity (passed from client after normal login)
-    // Guest joins with { guestId } issued by the /join REST call in Step 3
     socket.on("anonymous:join", async ({ roomId, guestId, hostUid }) => {
       try {
         const room = await AnonymousRoom.findOne({ roomId });
@@ -50,6 +64,14 @@ module.exports = function anonymousSocketHandler(io) {
           nickname: currentIdentity.nickname,
           status: "online",
         });
+
+        // NEW: tell the host (on their main socket) that a guest joined,
+        // so the sidebar can show a live "Anonymous · [nickname]" entry.
+        if (currentIdentity.type === "guest") {
+          await notifyHost(roomId, "anonymous:guest-joined", {
+            nickname: currentIdentity.nickname,
+          });
+        }
       } catch (err) {
         console.error("anonymous:join error:", err);
         socket.emit("anonymous:error", { message: "Failed to join room." });
@@ -94,6 +116,15 @@ module.exports = function anonymousSocketHandler(io) {
           fileType: message.fileType,
           createdAt: message.createdAt,
         });
+
+        // NEW: if a guest sent this, push a live preview update to the host's
+        // sidebar even if the host isn't currently on the anonymous chat page.
+        if (currentIdentity.type === "guest") {
+          await notifyHost(roomId, "anonymous:host-message-update", {
+            content: message.content || (message.fileUrl ? "📎 Attachment" : ""),
+            fromGuest: true,
+          });
+        }
       } catch (err) {
         console.error("anonymous:message error:", err);
         socket.emit("anonymous:error", { message: "Failed to send message." });
@@ -136,6 +167,12 @@ module.exports = function anonymousSocketHandler(io) {
     // --- End chat (either side) ---
     socket.on("anonymous:end", async ({ roomId }) => {
       try {
+        // NEW: notify host's main socket BEFORE deleting the room/messages,
+        // so notifyHost can still look up room.hostUser.
+        await notifyHost(roomId, "anonymous:ended", {
+          by: currentIdentity?.nickname || "unknown",
+        });
+
         await AnonymousRoom.findOneAndUpdate({ roomId }, { status: "ended" });
         await AnonymousMessage.deleteMany({ roomId });
         await GuestSession.deleteMany({ roomId });

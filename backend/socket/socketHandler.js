@@ -192,3 +192,8 @@ const socketHandler = (io) => {
 };
 
 module.exports = socketHandler;
+
+// NEW: exposes a way to look up a connected user's main-namespace socket ID,
+// used by anonymousSocketHandler.js to notify hosts of guest activity
+// even while the host is on the main NexChat UI (not the /anonymous namespace).
+module.exports.getOnlineSocketId = (userId) => onlineUsers.get(userId.toString());
