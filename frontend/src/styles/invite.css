@@ -207,16 +207,26 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 /* ============================================
-   Anonymous Chat Page — matches main NexChat UI
-   Append to frontend/src/styles/invite.css
+   REPLACEMENT for the two CSS blocks pasted earlier
+   (anon-page-additions.css + anon-components.css).
+   Delete those two blocks from invite.css and paste
+   this single block instead, appended after your
+   ORIGINAL invite.css content (the part with
+   .invite-page, .invite-card, .invite-btn etc. using
+   var(--bg-primary), var(--surface), var(--text-primary)).
+   Do NOT redefine .invite-page/.invite-card/.invite-btn
+   here — your original rules already handle those
+   correctly for both the invite landing page and the
+   "session not found" state, in both light and dark mode.
    ============================================ */
 
+/* ---------- Anonymous chat page shell ---------- */
 .anon-chat-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--bg-app, #0b0b13);
-  color: var(--text-primary, #f2f2f5);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: inherit;
 }
 
@@ -230,14 +240,14 @@
 }
 
 .anon-connecting-banner {
-  background: var(--bg-elevated, #1a1a26);
-  color: var(--text-secondary, #8b8b9a);
-  border-bottom: 1px solid var(--border-color, #24242f);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
 }
 
 .anon-error-banner {
   background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
+  color: var(--danger);
   border-bottom: 1px solid rgba(239, 68, 68, 0.3);
 }
 
@@ -250,20 +260,20 @@
   flex-direction: column;
   gap: 10px;
   scrollbar-width: thin;
-  scrollbar-color: var(--border-color, #24242f) transparent;
+  scrollbar-color: var(--border) transparent;
 }
 
 .anon-message-list::-webkit-scrollbar {
   width: 6px;
 }
 .anon-message-list::-webkit-scrollbar-thumb {
-  background: var(--border-color, #24242f);
+  background: var(--border);
   border-radius: 3px;
 }
 
 .anon-typing-indicator {
   font-size: 12px;
-  color: var(--text-secondary, #8b8b9a);
+  color: var(--text-secondary);
   font-style: italic;
   padding: 2px 4px;
 }
@@ -274,40 +284,40 @@
   align-items: center;
   gap: 10px;
   padding: 14px 20px;
-  background: var(--bg-sidebar, #101019);
-  border-top: 1px solid var(--border-color, #24242f);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
 }
 
 .anon-composer input {
   flex: 1;
-  background: var(--bg-elevated, #1a1a26);
-  border: 1px solid var(--border-color, #24242f);
-  border-radius: 22px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
   padding: 11px 18px;
-  color: var(--text-primary, #f2f2f5);
+  color: var(--text-primary);
   font-size: 14px;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color var(--transition);
 }
 
 .anon-composer input::placeholder {
-  color: var(--text-secondary, #6b6b78);
+  color: var(--text-muted);
 }
 
 .anon-composer input:focus {
-  border-color: var(--accent-purple, #7c5cff);
+  border-color: rgba(91, 106, 240, 0.6);
 }
 
 .anon-composer button {
-  background: linear-gradient(135deg, #7c5cff, #ff7a45);
+  background: var(--accent-gradient);
   color: #fff;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-full);
   padding: 10px 22px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.1s ease;
+  transition: opacity var(--transition), transform 0.1s ease;
 }
 
 .anon-composer button:hover {
@@ -316,50 +326,6 @@
 
 .anon-composer button:active {
   transform: scale(0.97);
-}
-
-/* ---------- "Session not found" state (invite-page/invite-card) ---------- */
-.invite-page {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-app, #0b0b13);
-}
-
-.invite-card {
-  background: var(--bg-sidebar, #101019);
-  border: 1px solid var(--border-color, #24242f);
-  border-radius: 16px;
-  padding: 36px 40px;
-  text-align: center;
-  max-width: 380px;
-  color: var(--text-primary, #f2f2f5);
-}
-
-.invite-card h2 {
-  margin: 0 0 10px;
-  font-size: 20px;
-}
-
-.invite-card p {
-  color: var(--text-secondary, #8b8b9a);
-  font-size: 14px;
-  margin: 0 0 22px;
-}
-
-.invite-btn.secondary {
-  background: var(--bg-elevated, #1a1a26);
-  color: var(--text-primary, #f2f2f5);
-  border: 1px solid var(--border-color, #24242f);
-  border-radius: 10px;
-  padding: 10px 20px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.invite-btn.secondary:hover {
-  border-color: var(--accent-purple, #7c5cff);
 }
 
 /* ---------- Sidebar additions (filter tabs + anon entries) ---------- */
@@ -372,21 +338,21 @@
 .sidebar-filter-tab {
   background: transparent;
   border: none;
-  color: var(--text-secondary, #8b8b9a);
+  color: var(--text-secondary);
   font-size: 12.5px;
   font-weight: 500;
   padding: 6px 12px;
-  border-radius: 14px;
+  border-radius: var(--radius-full);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background var(--transition), color var(--transition);
 }
 
 .sidebar-filter-tab:hover {
-  background: var(--bg-elevated, #1a1a26);
+  background: var(--bg-secondary);
 }
 
 .sidebar-filter-tab.active {
-  background: linear-gradient(135deg, #7c5cff, #ff7a45);
+  background: var(--accent-gradient);
   color: #fff;
 }
 
@@ -398,11 +364,11 @@
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  background: linear-gradient(135deg, #7c5cff, #4834d4);
+  background: var(--accent-gradient);
 }
 
 .anon-conv-item.unread .conv-name {
-  color: var(--text-primary, #f2f2f5);
+  color: var(--text-primary);
   font-weight: 700;
 }
 
@@ -410,7 +376,7 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #7c5cff;
+  background: rgba(91, 106, 240, 0.9);
   display: inline-block;
   margin-left: 8px;
   flex-shrink: 0;
@@ -419,7 +385,7 @@
 .favourite-star {
   background: transparent;
   border: none;
-  color: var(--text-secondary, #55555f);
+  color: var(--text-muted);
   font-size: 15px;
   cursor: pointer;
   padding: 2px 4px;
@@ -429,19 +395,15 @@
 .favourite-star.active {
   color: #ffb020;
 }
-/* ============================================
-   Anonymous chat components — header, bubbles, nickname modal
-   Append to frontend/src/styles/invite.css (after anon-page-additions.css)
-   ============================================ */
 
-/* ---------- Header ---------- */
+/* ---------- Anonymous chat header ---------- */
 .anon-chat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  background: var(--bg-sidebar, #101019);
-  border-bottom: 1px solid var(--border-color, #24242f);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
 }
 
 .anon-chat-header-left {
@@ -454,9 +416,9 @@
   font-size: 11px;
   font-weight: 600;
   color: #fff;
-  background: linear-gradient(135deg, #7c5cff, #ff7a45);
+  background: var(--accent-gradient);
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-full);
   white-space: nowrap;
 }
 
@@ -464,12 +426,12 @@
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-primary, #f2f2f5);
+  color: var(--text-primary);
 }
 
 .anon-status {
   font-size: 12px;
-  color: var(--text-secondary, #8b8b9a);
+  color: var(--text-secondary);
   text-transform: capitalize;
 }
 
@@ -479,7 +441,7 @@
 
 .anon-status.offline,
 .anon-status.connecting {
-  color: var(--text-secondary, #8b8b9a);
+  color: var(--text-secondary);
 }
 
 .anon-chat-header-right {
@@ -490,7 +452,7 @@
 
 .anon-countdown {
   font-size: 12.5px;
-  color: var(--text-secondary, #8b8b9a);
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -499,12 +461,12 @@
   border: none;
   cursor: pointer;
   font-size: 13px;
-  border-radius: 16px;
-  transition: opacity 0.15s ease, background 0.15s ease;
+  border-radius: var(--radius-full);
+  transition: opacity var(--transition), background var(--transition);
 }
 
 .anon-report-btn {
-  background: var(--bg-elevated, #1a1a26);
+  background: var(--bg-secondary);
   padding: 7px 10px;
 }
 
@@ -514,7 +476,7 @@
 
 .anon-end-btn {
   background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  color: var(--danger);
   font-weight: 600;
   padding: 7px 16px;
 }
@@ -548,15 +510,16 @@
 }
 
 .anon-bubble-row.own .anon-bubble {
-  background: linear-gradient(135deg, #7c5cff, #6440e0);
+  background: var(--accent-gradient);
   color: #fff;
   border-bottom-right-radius: 4px;
 }
 
 .anon-bubble-row.other .anon-bubble {
-  background: var(--bg-elevated, #1a1a26);
-  color: var(--text-primary, #f2f2f5);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   border-bottom-left-radius: 4px;
+  border: 1px solid var(--border);
 }
 
 .anon-bubble p {
@@ -585,7 +548,7 @@
   align-items: center;
   margin-top: 4px;
   font-size: 10.5px;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .anon-bubble-status {
@@ -596,8 +559,8 @@
   position: absolute;
   bottom: -14px;
   right: 8px;
-  background: var(--bg-sidebar, #101019);
-  border: 1px solid var(--border-color, #24242f);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1px 5px;
   font-size: 12px;
@@ -609,13 +572,13 @@
   position: absolute;
   top: -38px;
   right: 0;
-  background: var(--bg-sidebar, #101019);
-  border: 1px solid var(--border-color, #24242f);
-  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
   padding: 4px 6px;
   display: flex;
   gap: 4px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lg);
   z-index: 5;
 }
 
@@ -626,11 +589,11 @@
   font-size: 16px;
   padding: 2px 4px;
   border-radius: 50%;
-  transition: background 0.15s ease;
+  transition: background var(--transition);
 }
 
 .anon-reaction-picker button:hover {
-  background: var(--bg-elevated, #1a1a26);
+  background: var(--bg-secondary);
 }
 
 /* ---------- Nickname modal ---------- */
@@ -645,13 +608,14 @@
 }
 
 .nickname-modal {
-  background: var(--bg-sidebar, #101019);
-  border: 1px solid var(--border-color, #24242f);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 18px;
   padding: 32px 30px;
   width: 100%;
   max-width: 380px;
-  color: var(--text-primary, #f2f2f5);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-lg);
 }
 
 .nickname-modal.animate-slide-up {
@@ -672,30 +636,31 @@
 .nickname-modal h2 {
   margin: 0 0 6px;
   font-size: 19px;
+  color: var(--text-primary);
 }
 
 .nickname-sub {
   margin: 0 0 20px;
   font-size: 13px;
-  color: var(--text-secondary, #8b8b9a);
+  color: var(--text-secondary);
 }
 
 .nickname-modal input[type="text"] {
   width: 100%;
-  background: var(--bg-elevated, #1a1a26);
-  border: 1px solid var(--border-color, #24242f);
-  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 11px 14px;
-  color: var(--text-primary, #f2f2f5);
+  color: var(--text-primary);
   font-size: 14px;
   outline: none;
   box-sizing: border-box;
   margin-bottom: 14px;
-  transition: border-color 0.15s ease;
+  transition: border-color var(--transition);
 }
 
 .nickname-modal input[type="text"]:focus {
-  border-color: var(--accent-purple, #7c5cff);
+  border-color: rgba(91, 106, 240, 0.6);
 }
 
 .nickname-suggestions {
@@ -706,45 +671,23 @@
 }
 
 .nickname-chip {
-  background: var(--bg-elevated, #1a1a26);
-  border: 1px solid var(--border-color, #24242f);
-  color: var(--text-secondary, #c4c4cc);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
   font-size: 12.5px;
   padding: 6px 12px;
-  border-radius: 14px;
+  border-radius: var(--radius-full);
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition: border-color var(--transition), color var(--transition);
 }
 
 .nickname-chip:hover {
-  border-color: var(--accent-purple, #7c5cff);
-  color: var(--text-primary, #f2f2f5);
+  border-color: rgba(91, 106, 240, 0.6);
+  color: var(--text-primary);
 }
 
 .nickname-error {
-  color: #ef4444;
+  color: var(--danger);
   font-size: 12.5px;
   margin: -6px 0 12px;
-}
-
-.invite-btn.primary {
-  width: 100%;
-  background: linear-gradient(135deg, #7c5cff, #ff7a45);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 0;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.invite-btn.primary:hover {
-  opacity: 0.92;
-}
-
-.invite-btn.primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
