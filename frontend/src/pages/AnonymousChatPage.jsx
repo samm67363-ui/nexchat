@@ -95,14 +95,24 @@ export default function AnonymousChatPage() {
       {socketError && <div className="anon-error-banner">{socketError}</div>}
 
       <div className="anon-message-list">
-        {messages.map((m) => (
-          <AnonymousMessageBubble
-            key={m._id}
-            message={m}
-            isOwn={m.senderNickname === identity.nickname}
-            onReact={react}
-          />
-        ))}
+        {messages.map((m) => {
+          // Compare by role (host/guest), not nickname string — nickname
+          // comparison breaks if the guest happens to pick the same nickname
+          // as the host's username, or if currentUser.username and the
+          // backend's stored host.username differ in casing/whitespace.
+          const isOwn =
+            identity.type === "host"
+              ? m.senderType === "user"
+              : m.senderType === "guest";
+          return (
+            <AnonymousMessageBubble
+              key={m._id}
+              message={m}
+              isOwn={isOwn}
+              onReact={react}
+            />
+          );
+        })}
         {typingUser && typingUser !== identity.nickname && (
           <div className="anon-typing-indicator">{typingUser} is typing...</div>
         )}
