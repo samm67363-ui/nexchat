@@ -65,7 +65,15 @@ export default function AnonymousChatPage() {
     );
   }
 
-  const otherNickname = Object.keys(presence).find((n) => n !== identity.nickname);
+  // CHANGED: find the other participant by ROLE (host vs guest), not by
+  // comparing nickname strings. Nickname comparison breaks if identity.nickname
+  // is ever undefined/mismatched, or if the guest picks the same nickname as
+  // the host — in both cases it can wrongly pick up your OWN presence entry.
+  const otherEntry = Object.entries(presence).find(
+    ([, info]) => info.type && info.type !== identity.type
+  );
+  const otherNickname = otherEntry?.[0];
+  const otherStatus = otherEntry?.[1]?.status;
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -78,7 +86,7 @@ export default function AnonymousChatPage() {
     <div className="anon-chat-page">
       <AnonymousChatHeader
         otherNickname={otherNickname}
-        otherStatus={otherNickname ? presence[otherNickname] : "waiting"}
+        otherStatus={otherStatus || "waiting"}
         expiresAt={null /* room-level 24h backstop, not shown as urgent countdown */}
         onEndChat={endChat}
         onReport={async () => {
