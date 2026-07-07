@@ -56,9 +56,25 @@ module.exports = function anonymousSocketHandler(io) {
 
         currentRoomId = `anonymous:${roomId}`;
         socket.join(currentRoomId);
+        socket.data.identity = currentIdentity; // NEW: stash on the socket so it can be read back below
 
         room.lastActivityAt = new Date();
         await room.save();
+
+        // NEW: presence was previously broadcast only at join time, which
+        // meant whoever joined LATER never learned the other party was
+        // already online (they weren't connected yet to receive that
+        // earlier broadcast). Fix: tell the newly-joined socket directly
+        // about everyone already in the room.
+        const existingSockets = await anonNsp.in(currentRoomId).fetchSockets();
+        existingSockets.forEach((s) => {
+          if (s.id !== socket.id && s.data.identity) {
+            socket.emit("anonymous:presence", {
+              nickname: s.data.identity.nickname,
+              status: "online",
+            });
+          }
+        });
 
         anonNsp.to(currentRoomId).emit("anonymous:presence", {
           nickname: currentIdentity.nickname,
