@@ -1,5 +1,5 @@
 // frontend/src/pages/AnonymousChatPage.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import useAnonymousSocket from "../hooks/useAnonymousSocket";
@@ -15,12 +15,27 @@ export default function AnonymousChatPage() {
   const [input, setInput] = useState("");
   const bottomRef = useRef(null);
 
-  const guestData = JSON.parse(sessionStorage.getItem(`guest_${roomId}`) || "null");
-  const identity = guestData
-    ? { type: "guest", guestId: guestData.guestId, nickname: guestData.nickname }
-    : currentUser
-    ? { type: "host", hostUid: currentUser.uid, nickname: currentUser.username }
-    : null;
+  // FIX: read guestData once via useMemo (keyed on roomId) instead of on
+  // every render, and build `identity` via useMemo keyed on the underlying
+  // primitive values — not a fresh object literal each render. Previously
+  // this created a new `identity` reference on every render, which made
+  // useAnonymousSocket's useEffect tear down and reconnect the socket
+  // constantly (visible as dozens of short-lived websocket connections
+  // in the Network tab).
+  const guestData = useMemo(
+    () => JSON.parse(sessionStorage.getItem(`guest_${roomId}`) || "null"),
+    [roomId]
+  );
+
+  const identity = useMemo(() => {
+    if (guestData) {
+      return { type: "guest", guestId: guestData.guestId, nickname: guestData.nickname };
+    }
+    if (currentUser) {
+      return { type: "host", hostUid: currentUser.uid, nickname: currentUser.username };
+    }
+    return null;
+  }, [guestData, currentUser?.uid, currentUser?.username]);
 
   const {
     connected, messages, presence, typingUser, ended, socketError,
@@ -67,14 +82,13 @@ export default function AnonymousChatPage() {
         expiresAt={null /* room-level 24h backstop, not shown as urgent countdown */}
         onEndChat={endChat}
         onReport={async () => {
-  try {
-    await reportRoom(roomId, identity.nickname, "user-reported");
-    alert("Report submitted. Our team will review this conversation.");
-  } catch {
-    alert("Failed to submit report. Please try again.");
-  }
-}}
-
+          try {
+            await reportRoom(roomId, identity.nickname, "user-reported");
+            alert("Report submitted. Our team will review this conversation.");
+          } catch {
+            alert("Failed to submit report. Please try again.");
+          }
+        }}
       />
 
       {!connected && <div className="anon-connecting-banner">Reconnecting...</div>}
