@@ -74,7 +74,7 @@ export default function AnonymousChatPage() {
   );
   const otherNickname = otherEntry?.[0];
   const otherStatus = otherEntry?.[1]?.status;
-console.log("DEBUG presence:", presence, "my identity:", identity);
+
   const handleSend = () => {
     if (!input.trim()) return;
     sendMessage(input.trim());
@@ -97,7 +97,6 @@ console.log("DEBUG presence:", presence, "my identity:", identity);
             alert("Failed to submit report. Please try again.");
           }
         }}
-
       />
 
       {!connected && <div className="anon-connecting-banner">Reconnecting...</div>}
@@ -127,9 +126,7 @@ console.log("DEBUG presence:", presence, "my identity:", identity);
         )}
         <div ref={bottomRef} />
       </div>
-<div style={{ color: "red", fontSize: 11, padding: 8, background: "#fff" }}>
-  DEBUG presence: {JSON.stringify(presence)} | my type: {identity.type}
-</div>
+
       <div className="anon-composer">
         <input
           value={input}

@@ -71,6 +71,7 @@ module.exports = function anonymousSocketHandler(io) {
           if (s.id !== socket.id && s.data.identity) {
             socket.emit("anonymous:presence", {
               nickname: s.data.identity.nickname,
+              type: s.data.identity.type,
               status: "online",
             });
           }
@@ -78,6 +79,7 @@ module.exports = function anonymousSocketHandler(io) {
 
         anonNsp.to(currentRoomId).emit("anonymous:presence", {
           nickname: currentIdentity.nickname,
+          type: currentIdentity.type,
           status: "online",
         });
 
@@ -209,6 +211,7 @@ module.exports = function anonymousSocketHandler(io) {
       if (currentRoomId && currentIdentity) {
         socket.to(currentRoomId).emit("anonymous:presence", {
           nickname: currentIdentity.nickname,
+          type: currentIdentity.type,
           status: "offline",
         });
       }

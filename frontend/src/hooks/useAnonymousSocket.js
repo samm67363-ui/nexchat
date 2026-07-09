@@ -8,7 +8,12 @@ export default function useAnonymousSocket({ roomId, identity }) {
   const socketRef = useRef(null);
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [presence, setPresence] = useState({}); // { nickname: 'online'|'offline' }
+  // CHANGED: presence is now keyed by nickname but stores { status, type }
+  // instead of just a status string, so the parent component can match
+  // the "other" participant by role (host/guest) instead of comparing
+  // nickname strings — which breaks if a nickname is undefined or if the
+  // guest happens to type the same nickname as the host's username.
+  const [presence, setPresence] = useState({}); // { nickname: { status, type } }
   const [typingUser, setTypingUser] = useState(null);
   const [ended, setEnded] = useState(false);
   const [socketError, setSocketError] = useState("");
@@ -35,8 +40,8 @@ export default function useAnonymousSocket({ roomId, identity }) {
 
     socket.on("disconnect", () => setConnected(false));
 
-    socket.on("anonymous:presence", ({ nickname, status }) => {
-      setPresence((prev) => ({ ...prev, [nickname]: status }));
+    socket.on("anonymous:presence", ({ nickname, status, type }) => {
+      setPresence((prev) => ({ ...prev, [nickname]: { status, type } }));
     });
 
     socket.on("anonymous:message", (msg) => {
